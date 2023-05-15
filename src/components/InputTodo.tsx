@@ -1,5 +1,5 @@
 import { FaPlusCircle, FaSpinner, FaSearch } from 'react-icons/fa';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createTodo, getRocomendList } from '../api/todo';
 import useFocus from '../hooks/useFocus';
 import { Todo } from '../pages/Main';
@@ -23,7 +23,7 @@ const InputTodo = ({ setTodos }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const { ref, setFocus } = useFocus();
   const [recomendList, setRecomendList] = useState<Recomend>();
-
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     setFocus();
   }, [setFocus]);
@@ -56,28 +56,38 @@ const InputTodo = ({ setTodos }: Props) => {
     [inputText, setTodos]
   );
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
-    const noKoreaRegex = /^[A-Za-z0-9\s]+$/;
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const inputValue = e.target.value;
+      const noKoreaRegex = /^[A-Za-z0-9\s]+$/;
 
-    if (inputValue.trim() === '') {
-      setRecomendList(undefined);
-      setInputText('');
-      return;
-    }
+      if (inputValue.trim() === '') {
+        setRecomendList(undefined);
+        setInputText('');
+        return;
+      }
 
-    if (!noKoreaRegex.test(inputValue)) {
-      alert('Please enter only English letters.');
-      return;
-    }
+      if (!noKoreaRegex.test(inputValue)) {
+        alert('Please enter only English letters.');
+        return;
+      }
 
-    setInputText(inputValue);
-    const recomend: Recomend = (
-      (await getRocomendList(inputValue, 2)) as { data: Recomend }
-    ).data;
+      setInputText(inputValue);
 
-    setRecomendList(recomend);
-  };
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      const typingTimeout = setTimeout(async () => {
+        const recomend: Recomend = (
+          (await getRocomendList(inputValue, 2)) as { data: Recomend }
+        ).data;
+
+        setRecomendList(recomend);
+      }, 500);
+    },
+    [setInputText, setRecomendList]
+  );
 
   return (
     <>
