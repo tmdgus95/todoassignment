@@ -1,21 +1,14 @@
-import { Dispatch, SetStateAction } from 'react';
 import { createTodo } from '../api/todo';
 import { Todo } from '../pages/Main';
-
-type Props = {
-  recomend: string;
-  inputText: string;
-  setInputText: Dispatch<SetStateAction<string>>;
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-};
+import { RecomendItemProps } from '../types/RecomendItemProps';
 
 const RecomendItem = ({
   recomend,
   inputText,
   setInputText,
   setTodos,
-}: Props) => {
-  const highlightedRecomend = getHighlightedText(recomend, inputText);
+}: RecomendItemProps) => {
+  const highlightedRecomend = getHighlightedText(recomend || '', inputText);
 
   const handleClick = async (e: React.MouseEvent<HTMLLIElement>) => {
     const text = e.currentTarget.textContent;

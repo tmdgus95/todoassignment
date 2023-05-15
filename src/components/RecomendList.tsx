@@ -1,25 +1,12 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
-import { Recomend } from './InputTodo';
 import RecomendItem from './RecomendItem';
-import { Todo } from '../pages/Main';
-
-type Props = {
-  recomendList: Recomend | undefined;
-  inputText: string;
-  setInputText: Dispatch<SetStateAction<string>>;
-  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
-};
+import { RecomendItemProps } from '../types/RecomendItemProps';
 
 export default function RecomendList({
   recomendList,
   inputText,
   setInputText,
   setTodos,
-}: Props) {
-  useEffect(() => {
-    console.log(inputText);
-  }, [inputText]);
-
+}: RecomendItemProps) {
   return (
     <section>
       {inputText !== '' && recomendList?.result && (
