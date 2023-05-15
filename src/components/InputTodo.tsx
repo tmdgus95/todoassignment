@@ -99,7 +99,12 @@ const InputTodo = ({ setTodos }: Props) => {
           <FaSpinner className='spinner' />
         )}
       </form>
-      <RecomendList recomendList={recomendList} inputText={inputText} />
+      <RecomendList
+        recomendList={recomendList}
+        inputText={inputText}
+        setInputText={setInputText}
+        setTodos={setTodos}
+      />
     </>
   );
 };
