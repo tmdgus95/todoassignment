@@ -1,4 +1,4 @@
-import { FaPlusCircle, FaSpinner } from 'react-icons/fa';
+import { FaPlusCircle, FaSpinner, FaSearch } from 'react-icons/fa';
 import { useCallback, useEffect, useState } from 'react';
 import { createTodo, getRocomendList } from '../api/todo';
 import useFocus from '../hooks/useFocus';
@@ -58,9 +58,15 @@ const InputTodo = ({ setTodos }: Props) => {
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const englishRegex = /^[A-Za-z]+$/;
+    const noKoreaRegex = /^[A-Za-z0-9\s]+$/;
 
-    if (!englishRegex.test(inputValue)) {
+    if (inputValue.trim() === '') {
+      setRecomendList(undefined);
+      setInputText('');
+      return;
+    }
+
+    if (!noKoreaRegex.test(inputValue)) {
       alert('Please enter only English letters.');
       return;
     }
@@ -76,6 +82,7 @@ const InputTodo = ({ setTodos }: Props) => {
   return (
     <>
       <form className='form-container' onSubmit={handleSubmit}>
+        <FaSearch className='input-search' />
         <input
           className='input-text'
           placeholder='Add new todo...'
@@ -92,7 +99,7 @@ const InputTodo = ({ setTodos }: Props) => {
           <FaSpinner className='spinner' />
         )}
       </form>
-      <RecomendList recomendList={recomendList} />
+      <RecomendList recomendList={recomendList} inputText={inputText} />
     </>
   );
 };

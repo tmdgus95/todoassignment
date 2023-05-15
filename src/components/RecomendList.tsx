@@ -3,19 +3,23 @@ import RecomendItem from './RecomendItem';
 
 type Props = {
   recomendList: Recomend | undefined;
+  inputText: string;
 };
 
-export default function RecomendList({ recomendList }: Props) {
-  console.log('2', recomendList);
-
+export default function RecomendList({ recomendList, inputText }: Props) {
   return (
-    <section className='test'>
-      <ul>
-        {recomendList?.result &&
-          recomendList.result.map((recomend) => (
-            <RecomendItem key={recomend} recomend={recomend}></RecomendItem>
+    <section>
+      {recomendList?.result && (
+        <ul className='recomendContainer'>
+          {recomendList.result.map((recomend) => (
+            <RecomendItem
+              key={recomend}
+              recomend={recomend}
+              inputText={inputText}
+            ></RecomendItem>
           ))}
-      </ul>
+        </ul>
+      )}
     </section>
   );
 }
