@@ -1,9 +1,10 @@
 import { FaPlusCircle, FaSpinner, FaSearch } from 'react-icons/fa';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createTodo, getRocomendList } from '../api/todo';
+import { RecomendListResponse, createTodo, getRecomendList } from '../api/todo';
 import useFocus from '../hooks/useFocus';
 import { Todo } from '../pages/Main';
 import RecomendList from './RecomendList';
+import { AxiosResponse } from 'axios';
 
 type Props = {
   setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
@@ -22,8 +23,34 @@ const InputTodo = ({ setTodos }: Props) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { ref, setFocus } = useFocus();
-  const [recomendList, setRecomendList] = useState<Recomend>();
+  const [recomendList, setRecomendList] = useState<string[]>();
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const loadNextPage = async () => {
+    try {
+      const nextPage = currentPage + 1;
+      const recomend: Recomend = (
+        (await getRecomendList(inputText, nextPage)) as { data: Recomend }
+      ).data;
+
+      if (recomend) {
+        const newRecomendList = recomend.result;
+        // 기존 데이터에 새로운 페이지의 데이터를 추가하여 업데이트
+        setRecomendList((prevList) => {
+          if (prevList === undefined) {
+            return recomend.result;
+          } else {
+            return [...prevList, ...newRecomendList];
+          }
+        });
+        setCurrentPage(nextPage);
+      }
+    } catch (error) {
+      console.error('Failed to load next page:', error);
+    }
+  };
+
   useEffect(() => {
     setFocus();
   }, [setFocus]);
@@ -80,10 +107,10 @@ const InputTodo = ({ setTodos }: Props) => {
 
       const typingTimeout = setTimeout(async () => {
         const recomend: Recomend = (
-          (await getRocomendList(inputValue, 2)) as { data: Recomend }
+          (await getRecomendList(inputValue, 2)) as { data: Recomend }
         ).data;
 
-        setRecomendList(recomend);
+        setRecomendList(recomend.result);
       }, 500);
     },
     [setInputText, setRecomendList]
@@ -114,6 +141,7 @@ const InputTodo = ({ setTodos }: Props) => {
         inputText={inputText}
         setInputText={setInputText}
         setTodos={setTodos}
+        loadNextPage={loadNextPage}
       />
     </>
   );
